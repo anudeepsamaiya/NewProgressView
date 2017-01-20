@@ -3,6 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:orientation="vertical">
 
+    <com.anudeepsamaiya.progressview.ProgressView
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="16dp"
+        app:goalReachedColor="@color/green"
+        app:goalNotReachedColor="@color/colorAccent"
+        app:unfilledSectionColor="@color/gray"
+        app:barThickness="16dp"/>
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="click me"/>
 </LinearLayout>
