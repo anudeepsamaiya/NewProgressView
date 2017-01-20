@@ -1,16 +1,16 @@
 package com.anudeepsamaiya.progressview;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
     ProgressView progressBar;
     Button button;
+
+    int i = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar = (ProgressView) findViewById(R.id.progressBar);
         progressBar.setGoal(100);
 
-       button = (Button) findViewById(R.id.button);
+        button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -30,8 +30,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void resetProgress() {
-        final Random random = new Random();
-        int prog = random.nextInt(100);
-        progressBar.setProgress(prog);
+        if (i > 100)
+            i = 0;
+        i += 1;
+        float width = progressBar.getWidth()/100;
+        progressBar.setProgress(width);
     }
 }

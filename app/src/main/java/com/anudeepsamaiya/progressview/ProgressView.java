@@ -8,6 +8,7 @@ import android.graphics.CornerPathEffect;
 import android.graphics.DashPathEffect;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PathEffect;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -25,7 +26,7 @@ public class ProgressView extends View {
 
     private Paint progressPaint;
 
-    private int progress;
+    private float progress;
     private int goal;
 
     private boolean isGoalReached;
@@ -71,8 +72,6 @@ public class ProgressView extends View {
     }
 
     private void init(AttributeSet attrs) {
-        progressPaint = new Paint();
-
         TypedArray typedArray = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.GoalProgressBar, 0, 0);
         try {
             setGoalIndicatorHeight(typedArray.getDimensionPixelSize(R.styleable.GoalProgressBar_goalIndicatorHeight, 10));
@@ -86,44 +85,53 @@ public class ProgressView extends View {
             typedArray.recycle();
         }
 
+        progressPaint = new Paint();
         progressPaint.setAntiAlias(true); // enable anti aliasing
         progressPaint.setColor(getColor()); // set default color to white
         progressPaint.setDither(true); // enable dithering
         progressPaint.setStyle(Paint.Style.STROKE); // set to STOKE
+        progressPaint.setStrokeWidth(barThickness); //set stroke width
         progressPaint.setStrokeJoin(Paint.Join.ROUND); // set the join to round you want
         progressPaint.setStrokeCap(Paint.Cap.ROUND);  // set the progressPaint cap to round too
         progressPaint.setPathEffect(new CornerPathEffect(getBarThickness())); // set the path effect
     }
 
+
     @Override
     protected void onDraw(Canvas canvas) {
         int halfHeight = getHeight() / 2;
         int halfWidth = getWidth() / 2;
-        int progressEndX = (int) (getWidth() * progress / 100f);
+        int progressStartX;
+        int progressEndX = (int) (getWidth() * progress / 10f);
 
-
-        Path dashPath = new Path();
-        dashPath.moveTo(0, halfHeight);
-        dashPath.quadTo(halfWidth, halfHeight, getWidth(), halfHeight);
+        // draw the unfilled portion of the bar
         Paint dashPaint = new Paint();
-        dashPaint.setARGB(255, 0, 0, 0);
+        dashPaint.setColor(unfilledSectionColor);
         dashPaint.setStrokeWidth(barThickness / 12);
         dashPaint.setStyle(Paint.Style.STROKE);
-        dashPaint.setPathEffect(new DashPathEffect(new float[]{5, 5, 5, 5}, 0));
+        Path dashPath = new Path();
+        dashPaint.setPathEffect(new DashPathEffect(new float[]{10, 10, 10, 10}, 0));
+        dashPath.moveTo(progress, halfHeight);
+        dashPath.quadTo(halfWidth, halfHeight, getWidth(), halfHeight);
         canvas.drawPath(dashPath, dashPaint);
 
+        // draw the filled portion of the bar
+        int color = (progress >= goal) ? goalReachedColor : goalNotReachedColor;
+        progressPaint.setColor(color);
+        int width = getWidth()/100;
+        canvas.drawLine(width, halfHeight, progress, halfHeight, progressPaint);
+
         /*
-        // draw the unfilled portion of the bar
+        RectF rectF = new RectF();
+        rectF.set(barThickness, barThickness, getWidth() - barThickness, getHeight() - barThickness);
+        canvas.drawArc(rectF, 0, 90, false, progressPaint);
+        */
+
+        /*
         progressPaint.setColor(unfilledSectionColor);
         canvas.drawLine(progressEndX, halfHeight, getWidth(), halfHeight, progressPaint);
 
         */
-
-        // draw the filled portion of the bar
-        progressPaint.setStrokeWidth(barThickness);
-        int color = (progress >= goal) ? goalReachedColor : goalNotReachedColor;
-        progressPaint.setColor(color);
-        canvas.drawLine(0, halfHeight, progressEndX, halfHeight, progressPaint);
         /*
         // draw goal indicator
         int indicatorPosition = (int) (getWidth() * goal / 100f);
@@ -135,7 +143,8 @@ public class ProgressView extends View {
                 halfHeight - (goalIndicatorHeight / 2),
                 indicatorPosition,
                 halfHeight + (goalIndicatorHeight / 2),
-                progressPaint);*/
+                progressPaint);
+        */
 
     }
 
@@ -173,8 +182,8 @@ public class ProgressView extends View {
         return color;
     }
 
-    public void setProgress(int progress) {
-        this.progress = progress;
+    public void setProgress(float progress) {
+        this.progress += progress;
         updateGoalReached();
         invalidate();
     }
