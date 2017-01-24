@@ -102,7 +102,7 @@ public class ProgressView extends View {
         int halfHeight = getHeight() / 2;
         int halfWidth = getWidth() / 2;
         int progressStartX;
-        int progressEndX = (int) (getWidth() * progress / 10f);
+        int progressEndX = (int) (getWidth() * progress / goal);
 
         // draw the unfilled portion of the bar
         Paint dashPaint = new Paint();
@@ -119,7 +119,7 @@ public class ProgressView extends View {
         int color = (progress >= goal) ? goalReachedColor : goalNotReachedColor;
         progressPaint.setColor(color);
         int width = getWidth()/100;
-        canvas.drawLine(width, halfHeight, progress, halfHeight, progressPaint);
+        canvas.drawLine(width, halfHeight, progressEndX, halfHeight, progressPaint);
 
         /*
         RectF rectF = new RectF();
